@@ -75,7 +75,7 @@ function App() {
     return (<>
       <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>Practice ended! Results: </Modal.Title>
         </Modal.Header>
         <Modal.Body>
         <Table striped bordered hover>
@@ -87,7 +87,7 @@ function App() {
           </thead>
           <tbody>
             <tr>
-              <td>Time</td>
+              <td><strong>Time</strong></td>
               <td>{calculateTime(score.hours, score.minutes, score.seconds)} seconds</td>
             </tr>
             <tr>
@@ -107,15 +107,23 @@ function App() {
               <td>{score.twos + score.threes + score.fours}</td>
             </tr>
             <tr>
+              <td><strong>KPS</strong></td>
+              <td>{Math.floor((score.twos + score.threes + score.fours) / score.seconds)}</td>
+            </tr>
+            <tr>
               <td>Clicks</td>
               <td>{score.clicks}</td>
             </tr>
             <tr>
-              <td>CPS</td>
+              <td><strong>CPS</strong></td>
               <td>{Math.floor(score.clicks / calculateTime(score.hours, score.minutes, score.seconds))}</td>
             </tr>
           </tbody>
         </Table>
+        <span>
+        <div style={{textAlign: "left", marginLeft: "10px"}}>CPS - Clicks Per Second</div>
+        <div style={{textAlign: "left", marginLeft: "10px"}}>KPS - Keys (2,3,4) Per Second</div>
+        </span>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
@@ -171,10 +179,6 @@ function App() {
   }
 
   function handleClick() {
-    if(!['INGAME', 'READY'].includes(state)) {
-      return;
-    }
-    setClickCount(prev => ++prev);
     if(!click.current) {
       return;
     }
@@ -182,21 +186,25 @@ function App() {
     setTimeout(() => {
       click.current.style.backgroundColor = 'white'
     }, 100);
+    if(!['INGAME', 'READY'].includes(state)) {
+      return;
+    }
+    setClickCount(prev => ++prev);
   }
 
   useEventListener('keydown', handler);
 
   return (<div onClick={() => handleClick()} style={{width: "100vw", height: "100vh", padding: "20px"}}>
     <img src={background} alt="background" style={{position: "fixed", height: "100vh", width: "100vw", zIndex: "-9999", opacity: "0.2", left: "0", top: "0"}} />
-    <h2>
+    <h1>
       Zombies quickswitch practice
-    </h2>
-    <div>
+    </h1>
+    <div style={{margin: "10px", fontSize: "22px"}}>
       {display()}
     </div>
-    <Button variant="info" onClick={() => startGame()}>I'm ready</Button>
-    <div>
-      {['READY', 'INGAME', 'ENDED'].includes(state) && (
+    <Button variant="warning" onClick={() => startGame()} style={{width: "200px", height: "80px", fontSize: "30px", fontWeight: "bold", visibility: ['ENDED', 'WAITING'].includes(state) ? "visible" : "hidden"}}>I am ready</Button>
+    <div style={{margin: "10px"}}>
+      {['READY', 'INGAME', 'ENDED', 'WAITING'].includes(state) && (
         <>
           <span className="container">
             <span className="key" style={{backgroundColor: "white"}} ref={two}>2</span>
